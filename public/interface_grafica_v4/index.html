@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<title>Interface Gráfica (Protótipo 04)</title>
+		<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+		
+		<link rel="stylesheet" href="index.css" />
+		<link rel="stylesheet" href="res/joint.css" />
+		<link rel="stylesheet" href="res/jquery-ui.css" />
+		
+		<script src="res/jquery.min.js"></script>
+		<script src="res/jquery-ui.js"></script>
+		<script src="res/lodash.min.js"></script>
+		<script src="res/backbone-min.js"></script>
+		<script src="res/joint.js"></script>
+		<script src="res/joint.shapes.erd.js"></script>
+		
+		<script src="res/dagre.js"></script>
+		
+		<script type="text/javascript" src="res/canvg/rgbcolor.js"></script> 
+		<script type="text/javascript" src="res/canvg/StackBlur.js"></script>
+		<script type="text/javascript" src="res/canvg/canvg.js"></script> 
+	</head>
+    
+	<body>
+
+		<div class="bem-vindo">
+			<h1>Bem-vindo ao DerAcessível - Interface Gráfica</h1>
+			<ul>
+				<li>
+					Arraste um elemento da barra esquerda para inserí-lo.
+				</li>
+				<li>
+					Atributos e Herança devem ser arrastados sobre entidades.
+				</li>
+				<li>
+					Clique duas vezes no texto de um elemento para acessar as opções de edição: Alterar texto ou cardinalidade, conectar, excluir.
+				</li>
+				<li>
+					Para conectar 2 elementos, clique duas vezes no texto do elemento A, clique no botão conectar, clique uma vez no elemento B.
+				</li>
+			</ul>
+		</div>
+
+
+		
+		<!-- Barra lateral onde ficam os elementos que podem ser inseridos -->
+		<div id="barraEsquerda">
+			</br>
+			<div id="entidade" class="botaoEsquerda">
+				<img class="botao_esquerda_imagem" src="res/images/entidade.png" alt="Entidade" title="Entidade">
+			</div>
+			<div id="fraca" class="botaoEsquerda">
+				<img class="botao_esquerda_imagem" src="res/images/fraca.png" alt="Entidade fraca" title="Entidade fraca">
+			</div>
+			<div id="atributo" class="botaoEsquerda">
+				<img class="botao_esquerda_imagem" src="res/images/atributo.png" alt="Atributo" title="Atributo">
+			</div>
+			<div id="multivalorado" class="botaoEsquerda">
+				<img class="botao_esquerda_imagem" src="res/images/multivalorado.png" alt="Atributo multivalorado" title="Atributo multivalorado">
+			</div>
+			<div id="derivado" class="botaoEsquerda">
+				<img class="botao_esquerda_imagem" src="res/images/derivado.png" alt="Atributo derivado" title="Atributo derivado">
+			</div>
+			<div id="relacionamento" class="botaoEsquerda">
+				<img class="botao_esquerda_imagem" src="res/images/relacionamento.png" alt="Relacionamento" title="Relacionamento">
+			</div>
+			<div id="identificador" class="botaoEsquerda">
+				<img class="botao_esquerda_imagem" src="res/images/identificador.png" alt="Relacionamento identificador" title="Relacionamento identificador">
+			</div>
+			<div id="heranca" class="botaoEsquerda">
+				<img class="botao_esquerda_imagem" src="res/images/heranca.png" alt="Herança" title="Herança">
+			</div>
+		</div>
+		
+		<div id="areaDeDesenho"></div>
+		
+		<div id=box_editar class="box_flutuante">
+			<input type="text" class="transparente" name="box_texto" id="box_texto" size="9"></br></input>
+			<input class="botao_icone" id="box_confirma" title="Salvar alteração" type="image" src="res/images/confirma.png" width="16" height="16" onclick="botaoConfirma()">
+			<input class="botao_icone" id="box_deleta" title="Deletar elemento" type="image" src="res/images/deleta.png" width="16" height="16" onclick="botaoDeletaElemento()">
+			<input class="botao_icone" id="box_conecta" title="Conectar..." type="image" src="res/images/conecta.png" width="16" height="16" onclick="botaoConecta()">
+			<div class="transparente" id="box_select">
+				</br>
+				<select class="transparente" id="box_cardinalidade_min">
+					<option value="0">0</option>
+					<option value="1">1</option>
+				</select>..
+				<select class="transparente" id="box_cardinalidade_max">
+					<option value="1">1</option>
+					<option value="N">N</option>
+				</select>
+			</div>
+		</div>
+		
+		<img id="indicadorConexao" src="res/images/conecta.png">
+		
+		
+		<canvas id="canvas" width="724px" height="600px" style="border:solid black 1px; display:none;"></canvas>
+
+		<div class="options">
+			<div class="controls">
+				<button class="botao" onclick="botaoAutoLayout()">Auto-Layout</button>
+				<a id="downloadPNG"><button class="botao" onclick="gerarPNG()">Salvar como imagem</button></a>
+				<button class="botao" onclick="exportarDiagrama()">Exportar >>></button>
+				<button class="botao" onclick="importarDiagrama()">Importar <<<</button>
+			</div>
+			<textarea id="entradaJSON" rows="10" cols="100" ></textarea>
+		</div>
+
+
+		<script type="text/javascript">
+			//VARIÁVEIS
+			//Auxiliares
+			var opacoAtual; //Armazena o objeto do texto que está sendo editado
+			var elementoAtual; //Armazena o último elemento clicado	
+			var estadoConexao = false; //Indica se o diagrama está em modo "conexão"
+			var elementoConexao; //Armazena um elemento a ser conectado
+			var conexaoPermitida=false;
+			var cardinalidadeConexao;
+			var globalCodigoAtual = 0;
+			
+			//Área de desenho
+			var erd = joint.shapes.erd;
+			var graph = new joint.dia.Graph();
+			var paper = new joint.dia.Paper({
+				el: $('#areaDeDesenho'),
+				width: 724,
+				height: 600,
+				gridSize: 1,
+				model: graph,
+				linkPinning: false,
+				linkConnectionPoint: joint.util.shapePerimeterConnectionPoint
+			});
+			//////////////////////////
+			
+			
+			
+			//FUNÇÕES
+			//Inserir elemento na área de desenho
+			function criarElemento(posX, posY, tipoElemento){
+				
+				//ENTIDADE
+				if(tipoElemento === "entidade"){
+					var novaEntidade = new erd.Entity({
+						dados: {tipo: "Entidade", variacao: "Normal", codigo: globalCodigoAtual++},
+						position: { x: posX, y: posY },
+						attrs: {
+							tipo: 'entidade',
+							nome: 'Entidade',
+							text: {
+								class: 'aceitaEdicao',
+								fill: '#ffffff',
+								text: 'Entidade',
+								'letter-spacing': 0,
+								style: { 'text-shadow': '1px 0 1px #333333' }
+							},
+							'.outer, .inner': {
+								fill: '#31d0c6',
+								stroke: 'none',
+								filter: { name: 'dropShadow',  args: { dx: 0.5, dy: 2, blur: 2, color: '#333333' }}
+							}
+						}
+					})
+					//novaEntidade.prop('tipo','entidade')
+					graph.addCell(novaEntidade)
+				}
+				
+				else if(tipoElemento === "fraca"){
+					var novaEntidade = new erd.WeakEntity({
+						dados: {tipo: "Entidade", variacao: "Fraca", codigo: globalCodigoAtual++},
+						position: { x: posX, y: posY },
+						attrs: {
+							tipo: 'entidade',
+							nome: 'Entidade fraca',
+							text: {
+								class: 'aceitaEdicao',
+								fill: '#ffffff',
+								text: 'Entidade fraca',
+								'letter-spacing': 0,
+								style: { 'text-shadow': '1px 0 1px #333333' }
+							},
+							'.inner': {
+								fill: '#31d0c6',
+								stroke: 'none',
+								points: '155,5 155,55 5,55 5,5'
+							},
+							'.outer': {
+								fill: 'none',
+								stroke: '#31d0c6',
+								points: '160,0 160,60 0,60 0,0',
+								filter: { name: 'dropShadow',  args: { dx: 0.5, dy: 2, blur: 2, color: '#333333' }}
+							}
+						}
+					})
+					//novaEntidade.prop('tipo','entidade')
+					graph.addCell(novaEntidade)
+				}
+				//ATRIBUTO
+				else if (tipoElemento === "atributo"){
+					var elementosNoPonto = graph.findModelsFromPoint({ x: posX, y: posY });
+					if(elementosNoPonto.length > 0){
+						var elementoEscolhido = graph.getCell(elementosNoPonto[0].id);
+						if(elementoEscolhido.attr('tipo')==="entidade"){
+							var novoAtributo = new erd.Normal({
+								dados: {tipo: "Atributo", variacao: "Normal", codigo: globalCodigoAtual++},
+								position: { x: posX, y: posY },
+								attrs: {
+									tipo:'atributo',
+									nome:'Atributo',
+									text: {
+										class: 'aceitaEdicao',
+										fill: '#ffffff',
+										text: 'Atributo',
+										'letter-spacing': 0,
+										style: { 'text-shadow': '1px 0 1px #333333' }
+									},
+									'.outer': {
+										fill: '#fe8550',
+										stroke: '#fe854f',
+										filter: { name: 'dropShadow',  args: { dx: 0, dy: 2, blur: 2, color: '#222138' }}
+									}
+								}
+							});
+							elementoEscolhido.embed(novoAtributo)
+							graph.addCell(novoAtributo)
+							criaLink(elementoEscolhido, novoAtributo, false);
+						}
+					}
+				}
+				//ATRIBUTO MULTIVALORADO
+				else if (tipoElemento === "multivalorado"){
+					var elementosNoPonto = graph.findModelsFromPoint({ x: posX, y: posY });
+					if(elementosNoPonto.length > 0){
+						var elementoEscolhido = graph.getCell(elementosNoPonto[0].id);
+						if(elementoEscolhido.attr('tipo')==="entidade"){
+							var novoAtributo = new erd.Multivalued({
+								dados: {tipo: "Atributo", variacao: "Multivalorado", codigo: globalCodigoAtual++},
+								position: { x: posX, y: posY },
+								attrs: {
+									tipo:'atributo',
+									nome:'Atributo multivalorado',
+									text: {
+										class: 'aceitaEdicao',
+										fill: '#ffffff',
+										text: 'Atributo multivalorado',
+										'letter-spacing': 0,
+										style: { 'text-shadow': '1px 0 1px #333333' }
+									},
+									'.inner': {
+										fill: '#fe8550',
+										stroke: 'none',
+										rx: 43,
+										ry: 21
+									},
+									'.outer': {
+										fill: '#464a65',
+										stroke: '#fe8550',
+										filter: { name: 'dropShadow',  args: { dx: 0, dy: 2, blur: 2, color: '#222138' }}
+									}
+								}
+							});
+							elementoEscolhido.embed(novoAtributo)
+							graph.addCell(novoAtributo)
+							criaLink(elementoEscolhido, novoAtributo, false);
+						}
+					}
+				}
+				//ATRIBUTO DERIVADO
+				else if (tipoElemento === "derivado"){
+					var elementosNoPonto = graph.findModelsFromPoint({ x: posX, y: posY });
+					if(elementosNoPonto.length > 0){
+						var elementoEscolhido = graph.getCell(elementosNoPonto[0].id);
+						if(elementoEscolhido.attr('tipo')==="entidade"){
+							var novoAtributo = new erd.Derived({
+								dados: {tipo: "Atributo", variacao: "Derivado", codigo: globalCodigoAtual++},
+								position: { x: posX, y: posY },
+								attrs: {
+									tipo:'atributo',
+									nome:'Atributo derivado',
+									text: {
+										class: 'aceitaEdicao',
+										fill: '#ffffff',
+										text: 'Atributo derivado',
+										'letter-spacing': 0,
+										style: { 'text-shadow': '1px 0 1px #333333' }
+									},
+									'.inner': {
+										fill: '#fca079',
+										stroke: 'none',
+										'display': 'block'
+									},
+									'.outer': {
+										fill: '#464a65',
+										stroke: '#fe854f',
+										'stroke-dasharray': '3,1',
+										filter: { name: 'dropShadow',  args: { dx: 0, dy: 2, blur: 2, color: '#222138' }}
+									}
+								}
+							});
+							elementoEscolhido.embed(novoAtributo)
+							graph.addCell(novoAtributo)
+							criaLink(elementoEscolhido, novoAtributo, false);
+						}
+					}
+				}
+				//RELACIONAMENTO
+				else if (tipoElemento === "relacionamento"){
+					var novoRelacionamento = new erd.Relationship({
+						dados: {tipo: "Relacionamento", variacao: "Normal", codigo: globalCodigoAtual++},
+						position: { x: posX, y: posY },
+						attrs: {
+							tipo:'relacionamento',
+							nome:'Relacionamento',
+							text: {
+								class: 'aceitaEdicao',
+								fill: '#ffffff',
+								text: 'Relacionamento',
+								'letter-spacing': 0,
+								style: { 'text-shadow': '1px 0 1px #333333' }
+							},
+							'.outer': {
+								fill: '#797d9a',
+								stroke: 'none',
+								filter: { name: 'dropShadow',  args: { dx: 0, dy: 2, blur: 1, color: '#333333' }}
+							}
+						}
+					});
+					graph.addCell(novoRelacionamento)
+				}
+				//RELACIONAMENTO IDENTIFICADOR
+				else if (tipoElemento === "identificador"){
+					var novoRelacionamento = new erd.IdentifyingRelationship({
+						dados: {tipo: "Relacionamento", variacao: "Identificador", codigo: globalCodigoAtual++},
+						position: { x: posX, y: posY },
+						attrs: {
+							tipo:'relacionamento',
+							nome:'Relacionamento identificador',
+							text: {
+								class: 'aceitaEdicao',
+								fill: '#ffffff',
+								text: 'Relacionamento',
+								'letter-spacing': 0,
+								style: { 'text-shadow': '1px 0 1px #333333' }
+							},
+							'.inner': {
+								fill: '#7c68fd',
+								stroke: 'none'
+							},
+							'.outer': {
+								fill: 'none',
+								stroke: '#7c68fd',
+								filter: { name: 'dropShadow',  args: { dx: 0, dy: 2, blur: 1, color: '#333333' }}
+							}
+						}
+					});
+					graph.addCell(novoRelacionamento)
+				}
+				//HERANCA
+				else if (tipoElemento === "heranca"){
+					var elementosNoPonto = graph.findModelsFromPoint({ x: posX, y: posY });
+					if(elementosNoPonto.length > 0){
+						var elementoEscolhido = graph.getCell(elementosNoPonto[0].id);
+						if(elementoEscolhido.attr('tipo')==="entidade"){
+							var novaHeranca = new erd.ISA({
+								class: 'aceitaEdicao',
+								dados: {tipo: "Herança", variacao: "Normal", codigo: globalCodigoAtual++},
+								position: { x: posX, y: posY },
+								attrs: {
+									tipo:'heranca',
+									nome:'Herança',
+									text: {
+										class: 'aceitaEdicao',
+										fill: '#ffffff',
+										text: 'Herança',
+										'letter-spacing': 0,
+										style: { 'text-shadow': '1px 0 1px #333333' }
+									},
+									polygon: {
+										fill: '#fdb664',
+										stroke: 'none',
+										filter: { name: 'dropShadow',  args: { dx: 0, dy: 2, blur: 1, color: '#333333' }}
+									}
+								}
+							})
+							elementoEscolhido.embed(novaHeranca)
+							graph.addCell(novaHeranca)
+							criaLink(elementoEscolhido, novaHeranca, false);
+						}
+					}
+				}
+			}
+			
+			//CONEXÃO
+			//Conectar elementos
+			function botaoConecta(){
+				estadoConexao = true;
+				elementoConexao = elementoAtual;
+				esconderBoxFlutuante();
+				
+			}
+			function cancelaConexao(){
+				estadoConexao=false;
+				conexaoPermitida = false;
+				$('#indicadorConexao').css({visibility:'hidden'});
+			}
+			//Criar links
+			criaLink = function(elemento1, elemento2, cardinalidade) {
+				
+				var novoLink = new erd.Line({
+					source: { id: elemento1.id },
+					target: { id: elemento2.id },
+					dados:{
+						elementoA: elemento1.prop('dados/codigo'),
+						elementoB: elemento2.prop('dados/codigo'),
+						cardinalidadeA: "-1",
+					cardinalidadeB: "-1"}
+				});
+				novoLink.addTo(graph);
+				novoLink.attr({rect:{style:{'pointer-events':'none'}}});
+				paper.findViewByModel(novoLink).options.interactive = false;
+				
+				if(cardinalidade){
+					alteraCardinalidade(novoLink, "1..1")
+				}
+				
+				return novoLink;
+			};
+			
+			//Altera uma cardinalidade
+			function alteraCardinalidade(link, novaCardinalidade){
+				link.prop('dados/cardinalidadeA', novaCardinalidade.charAt(0));
+				link.prop('dados/cardinalidadeB', novaCardinalidade.charAt(3));
+				link.label(0, {
+					position: 0.5,
+					attrs: {
+						tipo: 'cardinalidade',
+						text: {
+							class: 'aceitaEdicao',
+							text: novaCardinalidade,
+							fill: 'black'
+						},
+						rect: { fill: 'none' }
+					} } )
+					link.prop('cardinalidade', novaCardinalidade)
+			}
+			
+			//ALTERAÇÃO DE ELEMENTOS JÁ INSERIDOS
+			//Botões
+			function botaoConfirma(){
+				esconderBoxFlutuante();
+				if(elementoAtual.isLink()){
+					console.log("botaoConfirma - é link!");
+					var novaCardinalidade = document.getElementById('box_cardinalidade_min').value + ".." + document.getElementById('box_cardinalidade_max').value;
+					alteraCardinalidade(elementoAtual, novaCardinalidade);
+					}else{
+					console.log("botaoConfirma - não é link!");
+					elementoAtual.attr('text/text', document.getElementById('box_texto').value)
+				}
+				
+			}
+			function botaoDeletaElemento(){
+				deletaElemento(elementoAtual);
+				esconderBoxFlutuante();
+			}
+			//Funções gerais
+			function alteraTextoElemento(elemento, novoTexto){
+				elemento.attr('text/text', novoTexto)
+			}
+			function deletaElemento(elemento){
+				elemento.remove();
+			}
+			//////////////////////////////////////
+			
+			
+			//INTERFACE
+			//Torna os botões do painel lateral arrastáveis
+			$(".botaoEsquerda").draggable ({
+				helper : "clone",
+				cursor: "move",
+				stop: function( event, ui ) {
+					if(estadoConexao) cancelaConexao();
+					var offset = $("#areaDeDesenho").offset();
+					var posX = event.pageX - offset.left;
+					var posY = event.pageY - offset.top;
+					var tipoElemento = event.target.id;
+					criarElemento(posX, posY, tipoElemento);
+				}
+			});
+			
+			/*
+				//Ação quando o mouse clica em uma área vazia
+				paper.on('blank:pointerclick', function(evt, x, y){
+				
+				})
+			*/
+			
+			//Captura o elemento que foi clicado
+			paper.on('cell:pointerclick',function(cellView, evt, x, y) {
+				id = cellView.model.id;
+				elementoAtual = graph.getCell(id);
+				console.log("elementoAtual: "+elementoAtual);
+				if(conexaoPermitida)
+				criaLink(elementoConexao, elementoAtual, cardinalidadeConexao);
+				cancelaConexao();
+			})
+			
+			paper.on('cell:mouseover', function(cellView, evt){
+				if(estadoConexao){
+					id = cellView.model.id;
+					var teste = graph.getCell(id);
+					//Testar se os elementos podem ser conectados
+					var tipoA = elementoConexao.attr('tipo');
+					var tipoB = teste.attr('tipo');
+					if(tipoA==="entidade" && tipoB==="relacionamento" || tipoA==="relacionamento" && tipoB==="entidade"){
+						//Conexão com cardinalidade
+						cardinalidadeConexao = true;
+						conexaoPermitida = true;
+						$('#indicadorConexao').css({ background: 'LimeGreen',	border: 'LimeGreen' });
+					}
+					else if(tipoA==="entidade" && tipoB==="heranca" || tipoA==="heranca" && tipoB==="entidade"){
+						//Conexão sem cardinalidade
+						cardinalidadeConexao = false;
+						conexaoPermitida = true;
+						$('#indicadorConexao').css({ background: 'LimeGreen',	border: 'LimeGreen' });
+						}else{
+						$('#indicadorConexao').css({ background: 'firebrick',	border: 'firebrick' });
+					}
+				}
+			})
+			
+			paper.on('cell:mouseout', function(cellView, evt){
+				if(estadoConexao){
+					conexaoPermitida = false;
+					$('#indicadorConexao').css({ background: 'azure',	border: 'azure' });
+				}
+			})
+			
+			
+			//Clique duplo em elementos - opções de edição
+			$(document).on('dblclick', '.aceitaEdicao', function () {
+				if(!estadoConexao){
+					var offset = $("#areaDeDesenho").offset();
+					var topo = $( this ).position().top - offset.top + 52;
+					var esquerda = $( this ).position().left -offset.left + 112;
+					
+					var tipo;
+					
+					if(elementoAtual.isLink()){
+						console.log("clique duplo - é link!");
+						tipo = "cardinalidade";
+					}
+					else{
+						console.log("clique duplo - não é link!");
+						tipo = elementoAtual.attr('tipo');
+					}
+					
+					
+					console.log("tipo: "+tipo);
+					$("#box_editar").css({top: topo, left: esquerda, position:'absolute'});
+					document.getElementById("box_editar").style.visibility = "visible";
+					
+					if(tipo==="cardinalidade"){
+						//Flutuante - Cardinalidade
+						console.log("cardinalidade "+$( this ).text().charAt(0)+" - "+$( this ).text().charAt(3));
+						document.getElementById("box_cardinalidade_min").value = $( this ).text().charAt(0);
+						document.getElementById("box_cardinalidade_max").value = $( this ).text().charAt(3);
+						document.getElementById("box_confirma").style.visibility = "visible";
+						document.getElementById("box_deleta").style.visibility = "visible";
+						document.getElementById("box_select").style.visibility = "visible";
+						}else if(tipo==="atributo"){
+						//Flutuante - Atributo
+						tornarOpaco($( this ));
+						document.getElementById("box_texto").value = $( this ).text();
+						document.getElementById("box_texto").style.visibility = "visible";
+						document.getElementById("box_confirma").style.visibility = "visible";
+						document.getElementById("box_deleta").style.visibility = "visible";
+						document.getElementById("box_conecta").style.visibility = "hidden";
+						document.getElementById("box_select").style.visibility = "hidden";
+						}else if(tipo==="heranca"){
+						//Flutuante - Heranca
+						document.getElementById("box_texto").style.visibility = "hidden";
+						document.getElementById("box_confirma").style.visibility = "hidden";
+						document.getElementById("box_deleta").style.visibility = "visible";
+						document.getElementById("box_conecta").style.visibility = "visible";
+						document.getElementById("box_select").style.visibility = "hidden";
+						}else if(tipo==="entidade" || tipo==="relacionamento"){
+						//Flutuante - Entidade ou Relacionamento
+						tornarOpaco($( this ));
+						document.getElementById("box_texto").value = $( this ).text();
+						document.getElementById("box_texto").style.visibility = "visible";
+						document.getElementById("box_confirma").style.visibility = "visible";
+						document.getElementById("box_deleta").style.visibility = "visible";
+						document.getElementById("box_conecta").style.visibility = "visible";
+						document.getElementById("box_select").style.visibility = "hidden";
+					}
+				}
+			});
+			
+			function tornarOpaco(objeto){
+				objeto.css({opacity:0});
+				opacoAtual = objeto;
+			}
+			
+			$('html').mousedown(function() {
+				esconderBoxFlutuante();
+			});
+			
+			$('#box_editar').mousedown(function(event){
+				event.stopPropagation();
+			});
+			
+			function esconderBoxFlutuante(){
+				document.getElementById("box_texto").style.visibility = "hidden";
+				document.getElementById("box_select").style.visibility = "hidden";
+				document.getElementById("box_deleta").style.visibility = "hidden";
+				document.getElementById("box_confirma").style.visibility = "hidden";
+				document.getElementById("box_conecta").style.visibility = "hidden";
+				document.getElementById("box_editar").style.visibility = "hidden";
+				if(opacoAtual !=null)
+				opacoAtual.css({opacity:1});
+			}
+			
+			$('#areaDeDesenho').mousemove(function(e){
+				if(estadoConexao){
+					$('#indicadorConexao').css({left: e.pageX-10, top:e.pageY+10, visibility:'visible'});
+				}
+			});
+			
+			
+			function faltaImplementar(){
+				alert("Falta implementar");
+			}
+			
+			function gerarPNG(){
+				var svgDoc = paper.svg;
+				var serializer = new XMLSerializer();
+				var svgString = serializer.serializeToString(svgDoc);
+				console.log("PNG - "+svgString);
+				canvg('canvas', svgString);
+				
+				var link = document.getElementById('downloadPNG');
+				link.href = document.getElementById('canvas').toDataURL();
+				link.download = "diagrama.png";
+				//$('link[rel~="stylesheet"]').prop('disabled', false);
+			}
+			
+			function l(t,m){
+				console.log("-----------");
+				console.log(t);
+				console.log(m);
+				console.log("-----------");
+			}
+			
+			
+			
+			
+			function exportarDiagrama(){
+				l("Exportando diagrama...",JSON.stringify(graph.toJSON()));
+				var objetoDiagrama = converteObjetoGrafoEmObjetoDiagrama(graph.toJSON());
+				l("Exportando diagrama...",JSON.stringify(objetoDiagrama));
+				$("#entradaJSON").val(JSON.stringify(objetoDiagrama));
+			}
+			
+			function converteObjetoGrafoEmObjetoDiagrama(objetoGrafo){
+				var listaElementos = [];
+				var listaConexoes = [];
+				
+				for(i=0; i<objetoGrafo.cells.length; i++){
+					var celula = objetoGrafo.cells[i];
+					if(celula.type==="erd.Line"){
+						var conexao = {elementoA:"", elementoB:"", cardinalidadeA:"", cardinalidadeB:""};
+						conexao.elementoA = celula.dados.elementoA;
+						conexao.elementoB = celula.dados.elementoB;
+						conexao.cardinalidadeA = celula.dados.cardinalidadeA;
+						conexao.cardinalidadeB = celula.dados.cardinalidadeB;						
+						listaConexoes.push(conexao);
+					}
+					else {
+						var elemento = {tipo:"", variacao:"", nome:"", posX:"", posY:""};
+						elemento.tipo = celula.dados.tipo;
+						elemento.variacao = celula.dados.variacao;
+						elemento.nome = graph.getCell(celula.id).attr('text/text');
+						elemento.codigo = celula.dados.codigo;
+						elemento.posX = celula.position.x;
+						elemento.posY = celula.position.y;
+						listaElementos.push(elemento);
+					}
+					
+				}
+				return {listaElementos, listaConexoes};
+			}
+			
+			function importarDiagrama(){
+				var objetoDiagrama = JSON.parse($("#entradaJSON").val());
+				l("Importando diagrama...",JSON.stringify(objetoDiagrama));
+				insereObjetoDiagramaNoGrafo(objetoDiagrama);
+				
+			}
+			
+			function insereObjetoDiagramaNoGrafo(objetoDiagrama){
+				var elementos = objetoDiagrama.listaElementos;
+				var conexoes = objetoDiagrama.listaConexoes;
+				graph.resetCells();
+				
+				for(var i=0; i<elementos.length; i++){
+					var e = elementos[i];
+					inserirElementoNoGrafo(e.tipo,e.variacao,e.nome,e.codigo,e.posX,e.posY);
+				}
+				
+				for(var i=0; i<conexoes.length; i++){
+					var c = conexoes[i];
+					inserirConexaoNoGrafo(c.elementoA, c.elementoB, c.cardinalidadeA, c.cardinalidadeB);
+				}
+			}
+			
+			function inserirElementoNoGrafo(tip, vari, nome, cod, posX, posY){
+				
+				//ENTIDADE
+				if(tip==="Entidade" && vari==="Normal"){
+					var novaEntidade = new erd.Entity({
+						dados: {tipo: tip, variacao: vari, codigo: cod},
+						position: { x: posX, y: posY },
+						attrs: {
+							tipo: 'entidade',
+							nome: 'Entidade',
+							text: {
+								class: 'aceitaEdicao',
+								fill: '#ffffff',
+								text: nome,
+								'letter-spacing': 0,
+								style: { 'text-shadow': '1px 0 1px #333333' }
+							},
+							'.outer, .inner': {
+								fill: '#31d0c6',
+								stroke: 'none',
+								filter: { name: 'dropShadow',  args: { dx: 0.5, dy: 2, blur: 2, color: '#333333' }}
+							}
+						}
+					})
+					//novaEntidade.prop('tipo','entidade')
+					graph.addCell(novaEntidade)
+				}
+				
+				else if(vari === "Fraca"){
+					var novaEntidade = new erd.WeakEntity({
+						dados: {tipo: tip, variacao: vari, codigo: cod},
+						position: { x: posX, y: posY },
+						attrs: {
+							tipo: 'entidade',
+							nome: 'Entidade fraca',
+							text: {
+								class: 'aceitaEdicao',
+								fill: '#ffffff',
+								text: nome,
+								'letter-spacing': 0,
+								style: { 'text-shadow': '1px 0 1px #333333' }
+							},
+							'.inner': {
+								fill: '#31d0c6',
+								stroke: 'none',
+								points: '155,5 155,55 5,55 5,5'
+							},
+							'.outer': {
+								fill: 'none',
+								stroke: '#31d0c6',
+								points: '160,0 160,60 0,60 0,0',
+								filter: { name: 'dropShadow',  args: { dx: 0.5, dy: 2, blur: 2, color: '#333333' }}
+							}
+						}
+					})
+					//novaEntidade.prop('tipo','entidade')
+					graph.addCell(novaEntidade)
+				}
+				//ATRIBUTO
+				else if (tip === "Atributo" && vari==="Normal"){
+					var novoAtributo = new erd.Normal({
+						dados: {tipo: tip, variacao: vari, codigo: cod},
+						position: { x: posX, y: posY },
+						attrs: {
+							tipo:'atributo',
+							nome:'Atributo',
+							text: {
+								class: 'aceitaEdicao',
+								fill: '#ffffff',
+								text: nome,
+								'letter-spacing': 0,
+								style: { 'text-shadow': '1px 0 1px #333333' }
+							},
+							'.outer': {
+								fill: '#fe8550',
+								stroke: '#fe854f',
+								filter: { name: 'dropShadow',  args: { dx: 0, dy: 2, blur: 2, color: '#222138' }}
+							}
+						}
+					});
+					graph.addCell(novoAtributo)
+				}
+				//ATRIBUTO MULTIVALORADO
+				else if (vari === "Multivalorado"){
+					var novoAtributo = new erd.Multivalued({
+						dados: {tipo: tip, variacao: vari, codigo: cod},
+						position: { x: posX, y: posY },
+						attrs: {
+							tipo:'atributo',
+							nome:'Atributo multivalorado',
+							text: {
+								class: 'aceitaEdicao',
+								fill: '#ffffff',
+								text: nome,
+								'letter-spacing': 0,
+								style: { 'text-shadow': '1px 0 1px #333333' }
+							},
+							'.inner': {
+								fill: '#fe8550',
+								stroke: 'none',
+								rx: 43,
+								ry: 21
+							},
+							'.outer': {
+								fill: '#464a65',
+								stroke: '#fe8550',
+								filter: { name: 'dropShadow',  args: { dx: 0, dy: 2, blur: 2, color: '#222138' }}
+							}
+						}
+					});
+					graph.addCell(novoAtributo)
+				}
+				//ATRIBUTO DERIVADO
+				else if (vari === "Derivado"){
+					var novoAtributo = new erd.Derived({
+						dados: {tipo: tip, variacao: vari, codigo: cod},
+						position: { x: posX, y: posY },
+						attrs: {
+							tipo:'atributo',
+							nome:'Atributo derivado',
+							text: {
+								class: 'aceitaEdicao',
+								fill: '#ffffff',
+								text: nome,
+								'letter-spacing': 0,
+								style: { 'text-shadow': '1px 0 1px #333333' }
+							},
+							'.inner': {
+								fill: '#fca079',
+								stroke: 'none',
+								'display': 'block'
+							},
+							'.outer': {
+								fill: '#464a65',
+								stroke: '#fe854f',
+								'stroke-dasharray': '3,1',
+								filter: { name: 'dropShadow',  args: { dx: 0, dy: 2, blur: 2, color: '#222138' }}
+							}
+						}
+					});
+					graph.addCell(novoAtributo)
+				}
+				//RELACIONAMENTO
+				else if (tip === "Relacionamento" && vari==="Normal"){
+					var novoRelacionamento = new erd.Relationship({
+						dados: {tipo: tip, variacao: vari, codigo: cod},
+						position: { x: posX, y: posY },
+						attrs: {
+							tipo:'relacionamento',
+							nome:'Relacionamento',
+							text: {
+								class: 'aceitaEdicao',
+								fill: '#ffffff',
+								text: nome,
+								'letter-spacing': 0,
+								style: { 'text-shadow': '1px 0 1px #333333' }
+							},
+							'.outer': {
+								fill: '#797d9a',
+								stroke: 'none',
+								filter: { name: 'dropShadow',  args: { dx: 0, dy: 2, blur: 1, color: '#333333' }}
+							}
+						}
+					});
+					graph.addCell(novoRelacionamento)
+				}
+				//RELACIONAMENTO IDENTIFICADOR
+				else if (vari=== "Identificador"){
+					var novoRelacionamento = new erd.IdentifyingRelationship({
+						dados: {tipo: tip, variacao: vari, codigo: cod},
+						position: { x: posX, y: posY },
+						attrs: {
+							tipo:'relacionamento',
+							nome:'Relacionamento identificador',
+							text: {
+								class: 'aceitaEdicao',
+								fill: '#ffffff',
+								text: nome,
+								'letter-spacing': 0,
+								style: { 'text-shadow': '1px 0 1px #333333' }
+							},
+							'.inner': {
+								fill: '#7c68fd',
+								stroke: 'none'
+							},
+							'.outer': {
+								fill: 'none',
+								stroke: '#7c68fd',
+								filter: { name: 'dropShadow',  args: { dx: 0, dy: 2, blur: 1, color: '#333333' }}
+							}
+						}
+					});
+					graph.addCell(novoRelacionamento)
+				}
+				//HERANCA
+				else if (tip === "Herança"){
+					var novaHeranca = new erd.ISA({
+						class: 'aceitaEdicao',
+						dados: {tipo: tip, variacao: vari, codigo: cod},
+						position: { x: posX, y: posY },
+						attrs: {
+							tipo:'heranca',
+							nome:'Herança',
+							text: {
+								class: 'aceitaEdicao',
+								fill: '#ffffff',
+								text: nome,
+								'letter-spacing': 0,
+								style: { 'text-shadow': '1px 0 1px #333333' }
+							},
+							polygon: {
+								fill: '#fdb664',
+								stroke: 'none',
+								filter: { name: 'dropShadow',  args: { dx: 0, dy: 2, blur: 1, color: '#333333' }}
+							}
+						}
+					})
+					graph.addCell(novaHeranca);
+				}
+				
+			}
+			
+			function inserirConexaoNoGrafo2(elementoA, elementoB, ca, cb){
+				var ea = encontraElementoPeloCodigo(elementoA);
+				var eb = encontraElementoPeloCodigo(elementoB);
+				
+				if(		ea.prop('dados/tipo'==='Atributo')
+				||	ea.prop('dados/tipo'==='Herança')){
+					criaLink(ea,eb,false);
+					eb.embed(ea);
+				}else if(	eb.prop('dados/tipo'==='Atributo')
+				||	eb.prop('dados/tipo'==='Herança')){
+					criaLink(ea,eb,false);
+					ea.embed(eb);		
+					}else{
+					var link = criaLink(ea,eb,true);
+					alteraCardinalidade(link,ca+".."+cb);
+				}
+			}
+			
+			function inserirConexaoNoGrafo(elementoA, elementoB, ca, cb){
+				console.log("Inserindo conexao... "+ca+".."+cb);
+				
+				var ea = encontraElementoPeloCodigo(elementoA);
+				var eb = encontraElementoPeloCodigo(elementoB);
+				
+				console.log("-----");
+				console.log(ea.prop('dados/tipo'));
+				console.log(eb.prop('dados/tipo'));
+				console.log("-----");
+				
+				if(ea.prop('dados/tipo')==='Atributo'
+				||	ea.prop('dados/tipo')==='Herança'){
+					criaLink(eb,ea,false);
+					eb.embed(ea);
+				}else if(	eb.prop('dados/tipo')==='Atributo'
+				||	eb.prop('dados/tipo')==='Herança'){
+					criaLink(ea,eb,false);
+					ea.embed(eb);		
+				}else{
+				console.log("Não é atributo ou herança.")
+					var link = criaLink(ea,eb,true);
+					alteraCardinalidade(link,ca+".."+cb);
+				}
+			}
+			
+			function encontraElementoPeloCodigo(c){
+				var tudo = graph.getElements();
+				for(var i=0; i<tudo.length; i++){
+					if(tudo[i].prop('dados/codigo') === c) return tudo[i];
+				}
+				
+				return "";
+			}
+			
+			
+			
+			
+			function botaoAutoLayout(){
+				var a = converteObjetoGrafoEmObjetoDiagrama(graph.toJSON());
+				a = autoLayout(a);
+				insereObjetoDiagramaNoGrafo(a);
+			}
+			
+			function autoLayout(objetoDiagrama){
+				console.log("Entrou no autoLayout");
+				var listaElementos = objetoDiagrama.listaElementos;
+				var listaConexoes = objetoDiagrama.listaConexoes;
+				
+				var dagreGraph = new dagre.graphlib.Graph();
+				dagreGraph.setGraph({});
+				dagreGraph.setDefaultEdgeLabel(function() { return {}; });
+				
+				for(i=0; i<listaElementos.length; i++){
+					dagreGraph.setNode(listaElementos[i].codigo, { label: listaElementos[i].nome, width: retornaLargura(listaElementos[i].tipo), height: retornaAltura(listaElementos[i].tipo) });
+					console.log(listaElementos[i].tipo + " - " + retornaLargura(listaElementos[i].tipo) + " - " + retornaAltura(listaElementos[i].tipo))
+				}
+				
+				for(i=0; i<listaConexoes.length; i++){
+					dagreGraph.setEdge(listaConexoes[i].elementoA,listaConexoes[i].elementoB);
+				}
+				
+				dagre.layout(dagreGraph);
+				for(i=0; i<listaElementos.length; i++){
+					listaElementos[i].posX = dagreGraph.node(listaElementos[i].codigo).x;
+					listaElementos[i].posY = dagreGraph.node(listaElementos[i].codigo).y;
+				}
+				console.log("Saiu do autoLayout");
+				return ({listaElementos,listaConexoes});
+			}
+			
+
+			//FUNÇÕES AUXILIARES
+			/*Funções que armazenam os valores padrões de altura e largura
+				entidade - 150x60
+				fraca - 150x60
+				atributo - 100x50
+				derivado - 100x50
+				multivalorado - 100x50
+				relacionamento - 80x80
+				identificador - 80x80
+			herança - 100x50*/
+			function retornaLargura(tipo){
+				if(tipo==="Entidade") return 150;
+				else if(tipo==="Relacionamento") return 80;
+				else return 100;
+			}
+			function retornaAltura(tipo){
+				if(tipo==="Entidade") return 60;
+				else if(tipo==="Relacionamento") return 80;
+				else return 50;
+			}
+			
+		</script>
+	</body>
+</html>

@@ -1,0 +1,44 @@
+#barraSuperior{
+    width: 100%;
+}
+
+#barraEsquerda{
+    width: 100px;
+    height: 600px;
+    background-color: white;
+    float:left;
+}
+
+.botaoEsquerda{
+    position: relative;
+}
+
+#areaGrafica{
+    width: 724px;
+    height: 600px;
+    float:left;
+    background-color: aliceblue;
+
+}
+
+#lateralDireita {
+    width: 300px;
+    height: 600px;
+    background-color: antiquewhite;
+    position: absolute;
+    left: 724px;
+
+}
+
+#tutorial{
+    position: absolute;
+    top: 0px;
+    z-index: 2;
+}
+
+#painelEditar{
+    visibility: hidden;
+    z-index: 3;
+    position: absolute;
+    top: 0px;
+}

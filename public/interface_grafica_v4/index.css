@@ -1,0 +1,147 @@
+html {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+body{
+	background-color: #E9ECF0;
+}
+.bem-vindo h1{
+	font-size: 16px;
+	margin-bottom: 0;
+}
+.bem-vindo ul {
+	font-size: 12px;
+	margin-top: 0;
+}
+.options {
+	width: 826px;
+	background-color: #929EA4;
+	display: flex;
+	flex-direction: row;
+	margin-top:20px;
+	margin-bottom: 40px;
+}
+.options .controls {
+	display: flex;
+	flex-direction: column;
+}
+.options .controls .botao {
+    background-color: #929EA4;
+    border: none;
+    color: #F2F2F2;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+}
+.options .controls .botao:hover {
+    background-color: #7A878E;
+}
+.options #entradaJSON {
+	width: 722px;
+}
+
+.centralizado{
+	margin: 0 auto;
+	max-width: 828px;
+}
+
+#barraEsquerda{
+    width: 100px;
+    height: 600px;
+    float:left;
+	background-color: white;
+	border: 1px solid #929EA4;
+	border-top: none;
+	
+}
+
+.botaoEsquerda{
+	transition: background-color 0.5s ease;
+	padding-left:3px;
+}
+
+.botaoEsquerda:hover{
+	background-color: #F2F2F2;
+}
+
+.botao_esquerda_imagem{
+	margin-left: auto;
+	margin-right: auto;
+	display: inline-block;
+	
+}
+
+#areaDeDesenho{
+    width: 724px;
+    height: 600px;
+    float:left;
+    background-color: #ffffff ; //506FB3
+}
+
+.box_flutuante {
+	visibility: hidden;
+	z-index: 10;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+}
+.botao_icone{
+	height:16px;
+	float:left;
+	background-color: azure;
+	transition: background-color 0.5s ease;
+	padding: 2px 13px;
+	display: inline-block;
+	border: 0.5px solid;
+}
+input#box_confirma.botao_icone:hover{
+	background-color: steelblue;
+	border-color: steelblue;
+}
+input#box_conecta.botao_icone:hover{
+	background-color: LimeGreen ;
+	border-color: LimeGreen ;
+}
+input#box_deleta.botao_icone:hover{
+	background-color: firebrick;
+	border-color: firebrick;
+}
+
+.transparente{
+	background: transparent;
+	border: none;
+	color: white;
+	text-shadow: 1px 0 1px #333333;
+	font-family: Arial;
+	font-size: 14px;
+	letter-spacing: 0;
+}
+select option{
+	color:black;
+}
+.tamanho_fonte{
+	height:16px;
+	background-color: azure;
+	transition: background-color 0.5s ease;
+	padding: 0.5px 5px;
+	display: inline-block;
+	border: 0.5px solid;
+	vertical-align:middle;
+}
+input.tamanho_fonte:hover{
+	background-color: steelblue;
+	border-color: steelblue;
+}
+
+#indicadorConexao{
+	position:absolute;
+	height:16px;
+	height:16px;
+	padding: 3px;
+	background-color: azure;
+
+	z-index:20;
+	visibility:hidden;
+}
