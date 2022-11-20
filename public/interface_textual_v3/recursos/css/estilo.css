@@ -1,0 +1,15 @@
+.margem-vertical{
+    margin-bottom:25px;
+    margin-top:25px;
+}
+
+#menuFisicoConteudo{
+    min-height: 350px;
+}
+
+#entrada{
+    max-width: 300px;
+    margin:0 auto;
+    margin-bottom:15px;
+    margin-top:10px;
+}

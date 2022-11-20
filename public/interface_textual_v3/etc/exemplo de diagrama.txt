@@ -1,0 +1,8 @@
+
+
+{"listaElementos":[{"tipo":"Entidade","variacao":"Normal","nome":"Aluno","posX":0,"posY":0,"codigo":0},{"tipo":"Relacionamento","variacao":"Normal","nome":"Frequenta","posX":0,"posY":0,"codigo":1},{"tipo":"Entidade","variacao":"Normal","nome":"Escola","posX":0,"posY":0,"codigo":2},{"tipo":"Atributo","variacao":"Normal","nome":"Nome","posX":0,"posY":0,"codigo":3},{"tipo":"Atributo","variacao":"Normal","nome":"Idade","posX":0,"posY":0,"codigo":4},{"tipo":"Atributo","variacao":"Normal","nome":"Endereço","posX":0,"posY":0,"codigo":6},{"tipo":"Atributo","variacao":"Normal","nome":"Registro","posX":0,"posY":0,"codigo":7}],"listaConexoes":[{"elementoA":1,"elementoB":2,"cardinalidadeA":"1","cardinalidadeB":"N"},{"elementoA":1,"elementoB":0,"cardinalidadeA":"1","cardinalidadeB":"1"},{"elementoA":0,"elementoB":3,"cardinalidadeA":"-1","cardinalidadeB":"-1"},{"elementoA":0,"elementoB":4,"cardinalidadeA":"-1","cardinalidadeB":"-1"},{"elementoA":2,"elementoB":6,"cardinalidadeA":"-1","cardinalidadeB":"-1"},{"elementoA":2,"elementoB":7,"cardinalidadeA":"-1","cardinalidadeB":"-1"}]}
+
+
+
+
+

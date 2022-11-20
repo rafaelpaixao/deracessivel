@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="recursos/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="recursos/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="recursos/jjsonviewer/css/jjsonviewer.css">
+  <link rel="stylesheet" href="recursos/css/estilo.css">
+  <link rel="stylesheet" href="recursos/css/loading.css">
+  <link rel="stylesheet" href="recursos/animateCSS/animate.css">
+  <title>Interface textual para DER</title>
+</head>
+
+<body>
+  <div class="loading">
+    <div class="sk-circle">
+      <div class="sk-circle1 sk-child"></div>
+      <div class="sk-circle2 sk-child"></div>
+      <div class="sk-circle3 sk-child"></div>
+      <div class="sk-circle4 sk-child"></div>
+      <div class="sk-circle5 sk-child"></div>
+      <div class="sk-circle6 sk-child"></div>
+      <div class="sk-circle7 sk-child"></div>
+      <div class="sk-circle8 sk-child"></div>
+      <div class="sk-circle9 sk-child"></div>
+      <div class="sk-circle10 sk-child"></div>
+      <div class="sk-circle11 sk-child"></div>
+      <div class="sk-circle12 sk-child"></div>
+    </div>
+  </div>
+  <div class="container-fluid">
+
+    <div class="row text-center">
+      <h1 class="margem-vertical">Interface textual para DER (v3.0)</h1>
+    </div>
+
+
+    <div class="row text-center">
+      <div class="btn-group">
+        <button type="button" class="btn btn-default" onclick="vaiParaMenuAnterior()">Voltar <kbd>Esc</kbd></button>
+        <button type="button" class="btn btn-default" onclick="vaiParaMenuPrincipal()">Início <kbd>Tab</kbd></button>
+        <button type="button" class="btn btn-default" onclick="executaAjuda()">Ajuda <kbd>Ctrl</kbd></button>
+      </div>
+      <h4 id="menuFisicoTitulo" class="margem-vertical"></h4>
+      <div id="menuFisicoConteudo" class="margem-vertical"></div>
+    </div>
+    <div class="row margem-vertical">
+      <div class="col-lg-4 col-md-4 col-sm-4">
+        <label>Diagrama:</label>
+        <div id="jjson" class="container-fluid jjson"></div>
+      </div>
+      <div class="col-lg-3 col-md-3 col-sm-3">
+        <div class="form-group">
+          <label>Narrador:</label>
+          <textarea class="form-control" rows="15" id='textarea_narrador'></textarea>
+        </div>
+      </div>
+      <div class="col-lg-2 col-md-2 col-sm-2">
+        <div class="form-group">
+          <label>Teclas:</label>
+          <textarea class="form-control" rows="15" id='textarea_teclas'></textarea>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-3 col-sm-3">
+        <h4>Protótipo v03.0</h4>
+        <br>
+        <label>Funcionamento:</label>
+        <p id="texto-funcionamento">Utilize as teclas <kbd><i class="fa fa-arrow-up" aria-hidden="true"></i></kbd>
+          <kbd><i class="fa fa-arrow-down" aria-hidden="true"></i></kbd> para navegar entre as opções. Use <kbd>ENTER</kbd>          para confirmar uma opção, e <kbd>ESC</kbd> para voltar ao menu anterior. A qualquer momento utilize <kbd>TAB</kbd>          para ir ao Menu Principal e <kbd>CTRL</kbd> para obter ajuda.
+        </p>
+        <br>
+        <label>Próximas funções:</label>
+        <ul>
+          <li>Incluir herança, variações nos tipos dos elementos, cardinalidades nos relacionamentos</li>
+          <li>Persistência do diagrama na sessão atual (navegação entre interfaces não destrói o diagrama)</li>
+        </ul>
+        <br>
+        <label>Histórico de atualizações:</label>
+        <ul>
+          <li>
+            <kbd>v03.0</kbd>
+            <ul>
+              <li>Adicionado sistema de múltiplos menus gráficos que refletem a navegação pelo teclado</li>
+              <li>Adicionados botões gráficos, com teclas de atalho, para funções Ajuda (ctrl), ir ao Menu Principal (tab), ir
+                ao menu anterior(esc)</li>
+              <li>Adicionada compatibilidade com dispositivos móveis</li>
+            </ul>
+          </li>
+          <li>
+            <kbd>v02.1</kbd>
+            <ul>
+              <li>Corrigido um bug onde o narrador sobrepunha frases.</li>
+              <li>Exportação para Interface Gráfica</li>
+            </ul>
+          </li>
+          <li>
+            <kbd>v02.1</kbd>
+            <ul>
+              <li>Alterar nome de entidade</li>
+              <li>Melhorias estéticas (interface compatível com Bootstrap)</li>
+            </ul>
+          </li>
+          <li>
+            <kbd>v02.0</kbd>
+            <ul>
+              <li>Criar, renomear, navegar atributos</li>
+              <li>Criar, renomear, navegar relacionamentos</li>
+              <li>Definir extremidades de um relacionamento</li>
+              <li>Visualização do diagrama em formato JSON</li>
+              <li>Compatibilidade com MeSpeak (biblioteca que gera o áudio do narrador)</li>
+            </ul>
+          </li>
+          <li>
+            <kbd>v01.1</kbd>
+            <ul>
+              <li>Alterar nome de entidade</li>
+              <li>Navegar nas entidades</li>
+              <li>Melhorias estéticas (interface compatível com Bootstrap)</li>
+            </ul>
+          </li>
+          <li>
+            <kbd>v01.0</kbd>
+            <ul>
+              <li>Criar entidades</li>
+              <li>Monitor de teclas pressionadas</li>
+              <li>Monitor de frases do narrador</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+
+  <script src="recursos/jquery-3.1.1.min.js"></script>
+  <script type="text/javascript" src="recursos/mespeak/mespeak.js"></script>
+  <script src="recursos/bootstrap/js/bootstrap.min.js"></script>
+  <script src="recursos/jjsonviewer/js/jjsonviewer.js"></script>
+  <script src="recursos/jquery.redirect.js"></script>
+  <script src="recursos/js/variaveis.js"></script>
+  <script src="recursos/js/narrador.js"></script>
+  <script src="recursos/js/auxiliares.js"></script>
+  <script src="recursos/js/view.js"></script>
+  <script src="recursos/js/principal.js"></script>
+  <script src="recursos/js/entidade.js"></script>
+  <script src="recursos/js/atributo.js"></script>
+  <script src="recursos/js/relacionamento.js"></script>
+  <script src="recursos/js/loading.js"></script>
+  <script>
+      $("#botaoIntGraf").click(function() {
+        if (!exportarParaInterfaceTextual()) {
+          alertaBotao();
+          setTimeout(alertaBotao, 3500);
+        }
+      });
+
+      function alertaBotao() {
+        $('#botaoIntGraf').tooltip("toggle");
+      }
+    </script>
+</body>
+
+</html>
