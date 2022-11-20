@@ -1,0 +1,62 @@
+{
+    "meta": {
+        "scheme_version": "1.0.0",
+        "author": "Autor",
+        "title": "Novo Diagrama",
+        "date_creation": "0000-00-00",
+        "date_last_modification": "0000-00-00"
+    },
+    "elements": [{
+            "element_id": "0",
+            "model": "Entidade",
+            "type": "Forte",
+            "is_primary_attribute": false,
+            "name": "Entidade 1",
+            "posx": "0",
+            "posy": "0"
+        },
+        {
+            "element_id": "1",
+            "model": "Entidade",
+            "type": "Forte",
+            "is_primary_attribute": false,
+            "name": "Entidade 2",
+            "posx": "0",
+            "posy": "0"
+        },
+        {
+            "element_id": "2",
+            "model": "Relacionamento",
+            "type": "Normal",
+            "is_primary_attribute": false,
+            "name": "Relacionamento 1",
+            "posx": "0",
+            "posy": "0"
+        }
+    ],
+    "links": [{
+            "type": "Relacionamento",
+            "relation_paper":null,
+            "origin": {
+                "element_id": "0",
+                "cardinality": "1"
+            },
+            "destiny": {
+                "element_id": "2",
+                "cardinality": "1"
+            }
+        },
+        {
+            "type": "Relacionamento",
+            "relation_paper":null,
+            "origin": {
+                "element_id": "2",
+                "cardinality": "1"
+            },
+            "destiny": {
+                "element_id": "1",
+                "cardinality": "1"
+            }
+        }
+    ]
+}

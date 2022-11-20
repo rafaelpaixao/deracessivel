@@ -1,0 +1,34 @@
+{
+    "meta": {
+        "scheme_version": "", //double
+        "author": "", //string
+        "title": "", //string
+        "date_creation": "", //date ISO YYYY-MM-DD
+        "date_last_modification": "" //date ISO YYYY-MM-DD
+    },
+    "tables": [{
+        "table_id":0,//int
+        "element_id": 0,//int
+        "name": "TABLE_NAME", //string, uppercase, no spaces, no ponctuation
+        "columns":[
+            {
+                "name":"COLUMN_NAME", //string, uppercase, no spaces
+                "sql_type":"VARCHAR",   // INTEGER, VARCHAR
+                "max_length":255, //int
+                "is_nullable":false, //boolean
+                "is_primary":false, //boolean
+                "references_to":{
+                    "table_name":null, //string,
+                    "column_name":null //string,
+                }
+            }
+        ],
+        "referenced_tables":[
+            {
+                "table_id":0, //int
+                "is_primary": false //boolean
+            }
+        ]
+    }],
+    "next_table_id": 0
+}

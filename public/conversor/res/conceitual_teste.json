@@ -1,0 +1,251 @@
+{
+    "meta": {
+        "scheme_version": "1.0.0",
+        "author": "Autor",
+        "title": "Novo Diagrama",
+        "date_creation": "0000-00-00",
+        "date_last_modification": "0000-00-00"
+    },
+    "elements": [{
+            "element_id": "0",
+            "model": "Entidade",
+            "type": "Forte",
+            "is_primary_attribute": false,
+            "name": "Empresa",
+            "posx": "0",
+            "posy": "0"
+        },
+        {
+            "element_id": "1",
+            "model": "Entidade",
+            "type": "Forte",
+            "is_primary_attribute": false,
+            "name": "Funcionário",
+            "posx": "0",
+            "posy": "0"
+        },
+        {
+            "element_id": "2",
+            "model": "Entidade",
+            "type": "Forte",
+            "is_primary_attribute": false,
+            "name": "Estagiário",
+            "posx": "0",
+            "posy": "0"
+        },
+        {
+            "element_id": "3",
+            "model": "Entidade",
+            "type": "Fraca",
+            "is_primary_attribute": false,
+            "name": "Dependente",
+            "posx": "0",
+            "posy": "0"
+        },
+        {
+            "element_id": "4",
+            "model": "Generalização",
+            "type": "Parcial",
+            "is_primary_attribute": false,
+            "name": "Generalização",
+            "posx": "0",
+            "posy": "0"
+        },
+        {
+            "element_id": "5",
+            "model": "Relacionamento",
+            "type": "Normal",
+            "is_primary_attribute": false,
+            "name": "Trabalha",
+            "posx": "0",
+            "posy": "0"
+        },
+        {
+            "element_id": "6",
+            "model": "Relacionamento",
+            "type": "Identificador",
+            "is_primary_attribute": false,
+            "name": "Depende",
+            "posx": "0",
+            "posy": "0"
+        },
+        {
+            "element_id": "7",
+            "model": "Atributo",
+            "type": "Simples",
+            "is_primary_attribute": true,
+            "name": "CNPJ",
+            "posx": "0",
+            "posy": "0"
+        },
+        {
+            "element_id": "8",
+            "model": "Atributo",
+            "type": "Multivalorado",
+            "is_primary_attribute": false,
+            "name": "Telefone",
+            "posx": "0",
+            "posy": "0"
+        },
+        {
+            "element_id": "9",
+            "model": "Atributo",
+            "type": "Simples",
+            "is_primary_attribute": true,
+            "name": "CPF",
+            "posx": "0",
+            "posy": "0"
+        },
+        {
+            "element_id": "10",
+            "model": "Atributo",
+            "type": "Simples",
+            "is_primary_attribute": false,
+            "name": "Curso",
+            "posx": "0",
+            "posy": "0"
+        },
+        {
+            "element_id": "11",
+            "model": "Atributo",
+            "type": "Simples",
+            "is_primary_attribute": false,
+            "name": "Setor",
+            "posx": "0",
+            "posy": "0"
+        }
+    ],
+    "links": [{
+            "type": "Atributo",
+            "relation_paper":null,
+            "origin": {
+                "element_id": "0",
+                "cardinality": "1"
+            },
+            "destiny": {
+                "element_id": "7",
+                "cardinality": "1"
+            }
+        },
+        {
+            "type": "Atributo",
+            "relation_paper":null,
+            "origin": {
+                "element_id": "0",
+                "cardinality": "1"
+            },
+            "destiny": {
+                "element_id": "8",
+                "cardinality": "1"
+            }
+        },
+        {
+            "type": "Atributo",
+            "relation_paper":null,
+            "origin": {
+                "element_id": "5",
+                "cardinality": "1"
+            },
+            "destiny": {
+                "element_id": "11",
+                "cardinality": "1"
+            }
+        },
+        {
+            "type": "Atributo",
+            "relation_paper":null,
+            "origin": {
+                "element_id": "2",
+                "cardinality": "1"
+            },
+            "destiny": {
+                "element_id": "10",
+                "cardinality": "1"
+            }
+        },
+        {
+            "type": "Atributo",
+            "relation_paper":null,
+            "origin": {
+                "element_id": "1",
+                "cardinality": "1"
+            },
+            "destiny": {
+                "element_id": "9",
+                "cardinality": "1"
+            }
+        },
+        {
+            "type": "Relacionamento",
+            "relation_paper":null,
+            "origin": {
+                "element_id": "0",
+                "cardinality": "1"
+            },
+            "destiny": {
+                "element_id": "5",
+                "cardinality": "1"
+            }
+        },
+        {
+            "type": "Relacionamento",
+            "relation_paper":null,
+            "origin": {
+                "element_id": "1",
+                "cardinality": "1"
+            },
+            "destiny": {
+                "element_id": "5",
+                "cardinality": "n"
+            }
+        },
+        {
+            "type": "Relacionamento",
+            "relation_paper":null,
+            "origin": {
+                "element_id": "1",
+                "cardinality": "1"
+            },
+            "destiny": {
+                "element_id": "6",
+                "cardinality": "1"
+            }
+        },
+        {
+            "type": "Relacionamento",
+            "relation_paper":null,
+            "origin": {
+                "element_id": "3",
+                "cardinality": "0"
+            },
+            "destiny": {
+                "element_id": "6",
+                "cardinality": "N"
+            }
+        },
+        {
+            "type": "Generalização",
+            "relation_paper":null,
+            "origin": {
+                "element_id": "1",
+                "cardinality": "1"
+            },
+            "destiny": {
+                "element_id": "4",
+                "cardinality": "1"
+            }
+        },
+        {
+            "type": "Especialização",
+            "relation_paper":null,
+            "origin": {
+                "element_id": "2",
+                "cardinality": "1"
+            },
+            "destiny": {
+                "element_id": "4",
+                "cardinality": "1"
+            }
+        }
+    ]
+}

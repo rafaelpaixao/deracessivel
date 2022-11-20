@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang='pt-br'>
+
+<head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <title>Teste</title>
+    <link href="vendor/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="vendor/jsoneditor.min.css" rel="stylesheet" type="text/css">
+    <script src='vendor/jquery-3.2.1.min.js'></script>
+    <script src="vendor/bootstrap.min.js"></script>
+    <script src="vendor/jsoneditor.min.js"></script>
+
+    <script src="build/js/der-acessivel.js"></script>
+    <script src="teste.js"></script>
+    <style>
+        .row {
+            margin-top: 10px;
+        }
+
+        .container {
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            margin: 0px 5px;
+        }
+        #data_text_l{
+            font-size: 13px;
+        }
+        #data_text_f{
+            font-size: 13px;
+        }
+        span[data-sql='command']{
+            color: blue;
+        }span[data-sql='table-name']{
+            color:#FBBC05;
+        }
+        p[data-sql='line'],p[data-sql='primary-key'],p[data-sql='foreign-key']{
+            padding-left: 20px;
+            margin: 0px;
+        }
+        span[data-relational="primary-keys"]{
+            text-decoration: underline;
+        }
+        p[data-relational="foreign-key"]{
+            padding-left: 20px;
+        }
+        span[data-relational="table"] p{
+            margin: 0;
+        }
+        div[data-sql="table"] p{
+            margin: 0;
+        }
+
+        
+            
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 text-center">
+                <button onclick="resetEditor()" class="btn btn-default">
+                    Reiniciar
+                </button>
+                <button onclick="loadTeste()" class="btn btn-default">
+                    Carregar JSON de teste
+                </button>
+                <button onclick="convert()" class="btn btn-default">
+                    Converter
+                </button>
+            </div>
+        </div>
+        <div class="row">
+            <ul class="nav nav-tabs">
+                <li class="active"><a data-toggle="tab" href="#data_json">Dados em JSON</a></li>
+                <li><a data-toggle="tab" href="#data_text">Dados em texto</a></li>
+                <li><a data-toggle="tab" href="#data_files">Acesso aos arquivos</a></li>
+            </ul>
+
+            <div class="tab-content">
+                <div id="data_json" class="tab-pane fade in active">
+                    <div class="col-xs-6">
+                        <h3>Diagrama Conceitual</h3>
+                        <div id="jsoneditor_c" style="width: 500px; height: 600px;"></div>
+                    </div>
+                    <div class="col-xs-6">
+                        <h3>Diagrama Relacional</h3>
+                        <div id="jsoneditor_r" style="width: 500px; height: 600px;"></div>
+                    </div>
+                </div>
+                <div id="data_text" class="tab-pane fade">
+                    <div class="col-xs-6">
+                        <h3>Modelo lógico</h3>
+                        <div class="panel panel-success">
+                            <div class="panel-body">
+                                <div id="data_text_l" style="padding: 20px 5px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-6">
+                        <h3>Modelo físico</h3>
+                        <div class="panel panel-warning">
+                            <div class="panel-body">
+                                <div id="data_text_f" style="padding: 20px 5px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="data_files" class="tab-pane fade">
+                    <div class="col-xs-12">
+                        <h3>Arquivos JSON</h3>
+                        <h4>Modelos das estruturas de dados</h4>
+                        <h5><a href="docs/old.json">JSON modelo conceitual ANTIGO (resultado das interfaces gráfica e textual)</a></h5>
+                        <h5><a href="docs/conceptual_model.json">JSON modelo conceitual NOVO (resultado das interfaces gráfica e textual)</a></h5>
+                        <h5><a href="docs/relational_model.json">JSON modelo relacional (resultado do conversor)</a></h5>
+                        <h3>Arquivos utilizados nesta demo</h3>
+                        <h5><a href="res/conceitual_vazio.json">Exemplo conceitual vazio</a></h5>
+                        <h5><a href="res/conceitual_teste.json">Exemplo conceitual teste</a></h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

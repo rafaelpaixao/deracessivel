@@ -1,0 +1,31 @@
+{
+    "meta": {
+        "scheme_version": "", //double
+        "author": "", //string
+        "title": "", //string
+        "date_creation": "", //date ISO YYYY-MM-DD
+        "date_last_modification": "" //date ISO YYYY-MM-DD
+    },
+    "elements": [{
+        "element_id": 0, //inteiro
+        "model": "modelo", //Entidade, Relacionamento, Atributo, Herança
+        "type": null, //[Forte, Fraca], [Normal, Identificador], [Simples, Multivalorado, Derivado], [null]
+        "is_primary_attribute": false, //boolean
+        "name": "Nome", //string
+        "pos_x": 0, //inteiro
+        "pos_y": 0 //inteiro
+    }],
+    "links": [{
+        "type": null, //Atributo, Relacionamento, Identificador, Generalização, Especialização
+        "relation_paper":null, //string
+        "origin": {
+            "element_id": 0, //inteiro
+            "cardinality": null
+        },
+        "destiny":{
+            "element_id": 0,
+            "cardinality": null
+        }
+    }],
+    "next_element_id": 0
+}
