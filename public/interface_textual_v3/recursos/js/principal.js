@@ -24,7 +24,8 @@ function carregarMenu(funcao,parametro){
 function exportarParaInterfaceGrafica(){
   if (diagrama.listaElementos.length > 0){
     loadingEntra();
-    $.redirect("interfacegrafica/index.php", {diagrama: JSON.stringify(diagrama)});
+    localStorage.setItem('diagrama', JSON.stringify(diagrama));
+    window.location.href = '/interface_grafica_v4';
   }else{
     return false;
   }

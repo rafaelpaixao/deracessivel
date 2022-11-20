@@ -101,6 +101,7 @@
 
 		<div class="options">
 			<div class="controls">
+				<button class="botao" onclick="botaoExportarTextual()">Exportar para interface textual</button>
 				<button class="botao" onclick="botaoAutoLayout()">Auto-Layout</button>
 				<a id="downloadPNG"><button class="botao" onclick="gerarPNG()">Salvar como imagem</button></a>
 				<button class="botao" onclick="exportarDiagrama()">Exportar >>></button>
@@ -1047,7 +1048,26 @@
 				else if(tipo==="Relacionamento") return 80;
 				else return 50;
 			}
+
+			function botaoExportarTextual() {
+				var diagrama = converteObjetoGrafoEmObjetoDiagrama(graph.toJSON());
+				localStorage.setItem('diagrama', JSON.stringify(diagrama));
+				window.location.href = '/interface_textual_v3';
+			}
 			
+			$(document).ready(function(){
+				try {
+					var saved_diagram = JSON.parse(localStorage.getItem('diagrama'));
+					if(saved_diagram.listaElementos && saved_diagram.listaConexoes) {
+						saved_diagram = autoLayout(saved_diagram);
+						insereObjetoDiagramaNoGrafo(saved_diagram);
+					}
+				} catch (e) {
+					// ignore
+				} finally {
+					localStorage.removeItem('diagrama');
+				}
+			});
 		</script>
 	</body>
 </html>

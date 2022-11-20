@@ -8,6 +8,18 @@ var frasesDoNarrador = {
 };
 
 var diagrama = {"listaElementos":[],"listaConexoes":[]};
+
+try {
+  var saved_diagram = JSON.parse(localStorage.getItem('diagrama'));
+  if(saved_diagram.listaElementos && saved_diagram.listaConexoes) {
+    diagrama = saved_diagram
+  }
+} catch (e) {
+  // ignore
+} finally {
+  localStorage.removeItem('diagram');
+}
+
 var menuAtual_tamanho;
 var menuAtual_opcaoAtual;
 var menuAtual;
